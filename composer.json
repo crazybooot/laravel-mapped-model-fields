@@ -1,0 +1,28 @@
+{
+  "name": "crazybooot/laravel-mapped-model-fields",
+  "description": "Add Eloquent Builder and Relation methods to create and update Models previously map fields",
+  "type": "library",
+  "authors": [
+    {
+      "name": "crazybooot",
+      "email": "crazybooot@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": "^7.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/",
+      "Crazybooot\\MappedModelFields\\": "/src"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Crazybooot\\MappedModelFields\\Providers\\ServiceProvider"
+      ]
+    }
+  }
+}
