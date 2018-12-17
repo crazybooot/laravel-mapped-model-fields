@@ -44,6 +44,17 @@ class ServiceProvider extends BaseServiceProvider
             return $this->create($attributes);
         });
 
+
+        Builder::macro('mapAndUpdate', function (array $attributes, array $append = [], array $exclude = []) use ($mapper) {
+            $model = $this->getModel();
+
+            $attributes = $model instanceof HasMappedFields
+                ? $mapper($model->getFieldsMap(), $attributes, $append, $exclude)
+                : $attributes;
+
+            return $model->update($attributes);
+        });
+
         Builder::macro('mapAndUpdateOrCreate', function (array $attributes, array $values = [], array $append = [], array $exclude = []) use ($mapper) {
             $model = $this->getModel();
 
@@ -62,6 +73,16 @@ class ServiceProvider extends BaseServiceProvider
                 : $attributes;
 
             return $this->create($attributes);
+        });
+
+        Relation::macro('mapAndUpdate', function (array $attributes, array $append = [], array $exclude = []) use ($mapper) {
+            $model = $this->getQuery()->getModel();
+
+            $attributes = $model instanceof HasMappedFields
+                ? $mapper($model->getFieldsMap(), $attributes, $append, $exclude)
+                : $attributes;
+
+            return $model->update($attributes);
         });
 
         Relation::macro('mapAndUpdateOrCreate', function (array $attributes, array $values = [], array $append = [], array $exclude = []) use ($mapper) {
