@@ -22,10 +22,9 @@ class ServiceProvider extends BaseServiceProvider
             $map = empty($exclude) ? $map : \array_diff_key($map, \array_flip($exclude));
 
             foreach ($map as $k => $v) {
-                if (\is_array($v) && isset($v['type'], $v['key'])) {
+                if (\is_array($v)) {
                     $value = \array_get($data, $v['key']);
-                    \settype($value, $v['type']);
-                    $mappedFields[$k] = $value;
+                    $mappedFields[$k] = \is_callable($v['transform'] ?? null) ? $v['transform']($value) : $value;
                 } else {
                     $mappedFields[$k] = \array_get($data, $v);
                 }
