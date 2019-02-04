@@ -7,6 +7,12 @@ use Crazybooot\MappedModelFields\Contracts\HasMappedFields;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use function is_array;
+use function array_diff_key;
+use function array_flip;
+use function array_get;
+use function array_merge;
+use function is_callable;
 
 /**
  * Class ServiceProvider
@@ -19,18 +25,19 @@ class ServiceProvider extends BaseServiceProvider
     {
         $mapper = function (array $map, array $data, array $append = [], array $exclude = []) {
             $mappedFields = [];
-            $map = empty($exclude) ? $map : \array_diff_key($map, \array_flip($exclude));
+            $map = empty($exclude) ? $map : array_diff_key($map, array_flip($exclude));
 
             foreach ($map as $k => $v) {
-                if (\is_array($v)) {
-                    $value = \array_get($data, $v['key']);
-                    $mappedFields[$k] = \is_callable($v['transform'] ?? null) ? $v['transform']($value) : $value;
+                if (is_array($v)) {
+                    $value = array_get($data, $v['key']);
+                    $value = is_callable($v['transform'] ?? false) ? $v['transform']($value) : $value;
+                    $mappedFields[$k] = $value;
                 } else {
-                    $mappedFields[$k] = \array_get($data, $v);
+                    $mappedFields[$k] = array_get($data, $v);
                 }
             }
 
-            return empty($append) ? $mappedFields : \array_merge($mappedFields, $append);
+            return empty($append) ? $mappedFields : array_merge($mappedFields, $append);
         };
 
         Builder::macro('mapAndCreate', function (array $attributes, array $append = [], array $exclude = []) use ($mapper) {
@@ -72,16 +79,6 @@ class ServiceProvider extends BaseServiceProvider
                 : $attributes;
 
             return $this->create($attributes);
-        });
-
-        Relation::macro('mapAndUpdate', function (array $attributes, array $append = [], array $exclude = []) use ($mapper) {
-            $model = $this->getQuery()->getModel();
-
-            $attributes = $model instanceof HasMappedFields
-                ? $mapper($model->getFieldsMap(), $attributes, $append, $exclude)
-                : $attributes;
-
-            return $model->update($attributes);
         });
 
         Relation::macro('mapAndUpdateOrCreate', function (array $attributes, array $values = [], array $append = [], array $exclude = []) use ($mapper) {
