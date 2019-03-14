@@ -119,3 +119,7 @@ You can specify transformation for mapped data:
             ];
         }
 ```
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE.MD) for more information.
